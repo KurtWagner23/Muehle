@@ -18,7 +18,6 @@ cd Muehle
 cmake -B build -S .
 cd build
 make
-./muehle-commandline
 ```
 
 ## On Windows or without CLI
@@ -26,3 +25,9 @@ make
 - Choose Kit 
 - Click on build on bottom bar
 - Click on Arrow on bottom bar
+
+## Start Program
+- in build folder
+```
+./muehle-commandline
+```
