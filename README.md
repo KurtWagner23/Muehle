@@ -10,14 +10,13 @@ cd Muehle
 
 ## Prerequisites
 - CMake 3.0 or Visual Studio CMakeTools
+- ninja (install with apt install ninja or brew install ninja)
 - C++ Compiler
 - **Optional** CMake Tools Extension in VS Code for easier building and testing
 
 ## How to build on Linux or MacOS
 ```
-cmake -B build -S .
-cd build
-make
+./build.sh
 ```
 
 ## On Windows or without CLI
@@ -27,7 +26,6 @@ make
 - Click on Arrow on bottom bar
 
 ## Start Program
-- in build folder
 ```
-./muehle-commandline
+./build/muehle-commandline
 ```
