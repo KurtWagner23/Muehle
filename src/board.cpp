@@ -3,11 +3,11 @@
 //  Muehle
 //
 //  Created by Phil on 30.05.22.
-//
+//  Updated on 26th of August 2024
 
 #include "board.hpp"
 
-// Funktionen des Brettes
+// TODO: implement the test cases for all methods
 Board::Board(std::string name_sp1, std::string name_sp2) {
     Sp1.setName(name_sp1);
     Sp2.setName(name_sp2);

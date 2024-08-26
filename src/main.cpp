@@ -40,6 +40,7 @@ int main() {
                 std::pair<Point, Point> Points = Gameboard.UserInput();
                 Gameboard.removePiece(Points.first);
             } break;
+            // TODO: change language to english
             case Player::GamePhase::GameEnd: {
                 Player::EndState end =
                     Gameboard.getCurrentPlayer().getEndState();
@@ -90,6 +91,7 @@ int main() {
                 exit(-12321);
             } break;
         }
+        // TODO: check if this is the right place for this method
         Gameboard.updateGamePhases();
         // continue the loop and dont change the player to cover the morris
         if (Gameboard.getCurrentPlayer().getCurrentPhase() ==
