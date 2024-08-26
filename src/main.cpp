@@ -6,126 +6,95 @@
 //
 
 #include <iostream>
-#include "Brettlogik.hpp"
 
+#include "board.hpp"
 
-
-int main()
-{
-
-    Brett Spielbrett("Heinz", "Karl");
-    Spielbrett.printBrett();
+int main() {
+    Board Gameboard("Heinz", "Karl");
+    Gameboard.printBoard();
     int ende = 0;
     while (ende != 1) {
-        switch (Spielbrett.getaktuellerSpieler().getAktuellePhase()) {
-
-            case Spieler::Setzphase:
-            {
-                Spielbrett.loescheBrett();
-                Spielbrett.SetzeStein(Spielbrett.SteinSetzbar());
-            
-            }break;
-            case Spieler::Zugphase:
-            {
-                if (!Spielbrett.zugunfaehig()) {
-
-                    Spielbrett.loescheBrett();
-
-
-                    int aktuelleAnzahlSteine = Spielbrett.getaktuellerSpieler().getSpielSteinAnzahl();
-                    if (aktuelleAnzahlSteine == 3) {
-
-                        Spielbrett.getaktuellerSpieler().setAktullePhase(Spieler::Sprungphase);
-                        Spielbrett.loescheBrett();
-                        Spielbrett.springeStein();
-
-                    }
-                    else {
-                        Spielbrett.verschiebeStein();
-                    }
-                }
-            } break;
-            case Spieler::Sprungphase:
-            {
-                Spielbrett.loescheBrett();
-
-                if (Spielbrett.unentschieden()) {
-                    Spielbrett.getaktuellerSpieler().setAktullePhase(Spieler::Spielende);
-                    Spielbrett.getaktuellerSpieler().getNextSpieler()->setAktullePhase(Spieler::Spielende);
-
-                    std::cout << "unentschieden" << std::endl;
-
-
-                }
-                else if (Spielbrett.zugunfaehig()) {    // ! entfernt
-
-                    std::cout << "zugunfaehig" << std::endl;
-
-                
-
-                    Spielbrett.getaktuellerSpieler().setAktullePhase(Spieler::Spielende);
-                    Spielbrett.getaktuellerSpieler().getNextSpieler()->setAktullePhase(Spieler::Spielende);
-
-                    Spielbrett.getaktuellerSpieler().setEndstatus(Spieler::Verloren);
-                    Spielbrett.getaktuellerSpieler().getNextSpieler()->setEndstatus(Spieler::Gewonnen);
-
-
-
-                }
-                else { Spielbrett.springeStein(); }
-
+        switch (Gameboard.getCurrentPlayer().getCurrentPhase()) {
+            case Player::GamePhase::PlacementPhase: {
+                Gameboard.clearBoardOutput();
+                std::pair<Point, Point> input = Gameboard.UserInput();
+                Gameboard.placePiece(input.first);
 
             } break;
-            case Spieler::Spielende:
-            {
+            case Player::GamePhase::TurnPhase: {
+                if (!Gameboard.noMovesAvailable()) {
+                    Gameboard.clearBoardOutput();
+                    std::pair<Point, Point> input = Gameboard.UserInput();
+                    Gameboard.movePiece(input.first, input.second);
+                }
+            } break;
+            case Player::GamePhase::JumpPhase: {
+                if (!Gameboard.noMovesAvailable()) {
+                    Gameboard.clearBoardOutput();
+                    std::pair<Point, Point> input = Gameboard.UserInput();
+                    Gameboard.jumpPiece(input.first, input.second);
+                }
+            } break;
+            case Player::GamePhase::Morris: {
+                Gameboard.clearBoardOutput();
+                std::pair<Point, Point> Points = Gameboard.UserInput();
+                Gameboard.removePiece(Points.first);
+            } break;
+            case Player::GamePhase::GameEnd: {
+                Player::EndState end =
+                    Gameboard.getCurrentPlayer().getEndState();
 
+                switch (end) {
+                    case Player::EndState::Win: {
+                        std::cout << "Player: "
+                                  << Gameboard.getCurrentPlayer().getName()
+                                  << " hat gewonnen!!!!!!!!!" << std::endl;
+                        std::cout << "Player: "
+                                  << Gameboard.getCurrentPlayer()
+                                         .getNextPlayer()
+                                         ->getName()
+                                  << " hat verloren" << std::endl;
 
-                int erg= Spielbrett.getaktuellerSpieler().getEndstatus();
+                    } break;
+                    case Player::EndState::Loose: {
+                        std::cout << "Player: "
+                                  << Gameboard.getCurrentPlayer()
+                                         .getNextPlayer()
+                                         ->getName()
+                                  << " hat gewonnen!!!!!!!!!" << std::endl;
+                        std::cout << "Player: "
+                                  << Gameboard.getCurrentPlayer().getName()
+                                  << " hat verloren" << std::endl;
 
-                switch (erg) {
+                    } break;
+                    case Player::EndState::Draw: {
+                        std::cout << "Player: "
+                                  << Gameboard.getCurrentPlayer().getName()
+                                  << " und "
+                                  << Gameboard.getCurrentPlayer()
+                                         .getNextPlayer()
+                                         ->getName();
+                        std::cout << " haben unentschieden gespielt!"
+                                  << std::endl;
 
-                    case Spieler::Gewonnen: {
-                        std::cout << "Spieler: " << Spielbrett.getaktuellerSpieler().getName() << " hat gewonnen!!!!!!!!!"<<std::endl;
-                        std::cout << "Spieler: " << Spielbrett.getaktuellerSpieler().getNextSpieler()->getName() << " hat verloren" << std::endl;
-
-                    }break;
-                    case Spieler::Verloren: {
-                        std::cout << "Spieler: " << Spielbrett.getaktuellerSpieler().getNextSpieler()->getName() << " hat gewonnen!!!!!!!!!"<< std::endl;
-                        std::cout << "Spieler: " << Spielbrett.getaktuellerSpieler().getName() << " hat verloren" << std::endl;
-
-                    }break;
-                    case Spieler::Unentschieden: {
-
-                        std::cout << "Spieler: " << Spielbrett.getaktuellerSpieler().getName()<< " und "<<Spielbrett.getaktuellerSpieler().getNextSpieler()->getName();
-                        std::cout << " haben unentschieden gespielt!" << std::endl;
-
-                    }break;
+                    } break;
                     default: {
                         exit(-121);
-                    }break;
-
+                    } break;
                 }
 
                 ende = 1;
 
             } break;
-            default:
-            {
+            default: {
                 exit(-12321);
-            }break;
-
+            } break;
         }
-
-        Spielbrett.setnextaktuellerSpieler();
-        
-
+        Gameboard.updateGamePhases();
+        // continue the loop and dont change the player to cover the morris
+        if (Gameboard.getCurrentPlayer().getCurrentPhase() ==
+            Player::GamePhase::Morris)
+            continue;
+        Gameboard.setNextCurrentPlayer();
     }
-
-
 }
-
-
-
-
-
-
