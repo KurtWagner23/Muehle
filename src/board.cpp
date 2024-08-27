@@ -101,6 +101,7 @@ std::pair<Point, Point> Board::UserInput() {
         default:
             break;
     }
+    return std::pair<Point, Point>();
 }
 
 bool Board::isRemoveValid(Point& p) {
