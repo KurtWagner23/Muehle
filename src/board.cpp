@@ -7,7 +7,12 @@
 
 #include "board.hpp"
 
-// TODO: implement the test cases for all methods
+Board::Board() {
+    Sp1.setName("default1");
+    Sp2.setName("default2");
+    Sp1.setNextPlayer(Sp2);
+    Sp2.setNextPlayer(Sp1);
+}
 Board::Board(std::string name_sp1, std::string name_sp2) {
     Sp1.setName(name_sp1);
     Sp2.setName(name_sp2);
@@ -145,11 +150,9 @@ void Board::updateGamePhases() {
         getCurrentPlayer().getNextPlayer()->setCurrentPhase(
             Player::GamePhase::JumpPhase);
     } else if (getCurrentPlayer().getNextPlayer()->getMaxPieces() == 2) {
+        getCurrentPlayer().setCurrentPhase(Player::GamePhase::GameEnd);
         getCurrentPlayer().getNextPlayer()->setCurrentPhase(
             Player::GamePhase::GameEnd);
-        getCurrentPlayer().getNextPlayer()->setCurrentPhase(
-            Player::GamePhase::GameEnd);
-
         getCurrentPlayer().setEndState(Player::EndState::Win);
         getCurrentPlayer().getNextPlayer()->setEndState(
             Player::EndState::Loose);
@@ -185,7 +188,6 @@ bool Board::isMovePossible(Point& dest, Point& current) {
                     if (var == -2 || var == 2)
                         return true;
                 }
-
             } else if (dest.getX() == current.getX()) {
                 int var = dest.getY() - current.getY();
                 if (current.getX() == 0 || current.getX() == 12) {
@@ -297,8 +299,8 @@ void Board::jumpPiece(Point& dest, Point& current) {
     }
 
     if (isMorris(dest)) {
-        getCurrentPlayer().setBeforePhase(getCurrentPlayer().getCurrentPhase());
-        getCurrentPlayer().setCurrentPhase(Player::GamePhase::Morris);
+        currentPlayer->setBeforePhase(getCurrentPlayer().getCurrentPhase());
+        currentPlayer->setCurrentPhase(Player::GamePhase::Morris);
     }
 }
 
@@ -311,104 +313,63 @@ bool Board::checkForDraw() {
 }
 
 bool Board::noMovesAvailable() {
-    char stein = WHITE;
+    char stein = (currentPlayer == &Sp2) ? BLACK : WHITE;
 
-    int schrittweite = 1;
-    int anzahlfreiernachbarplaetze = 0;
+    // Check if the player is in the jumping phase
+    bool isJumpingPhase =
+        (currentPlayer->getCurrentPhase() == Player::GamePhase::JumpPhase);
 
-    if (currentPlayer == &Sp2) {
-        stein = BLACK;
+    if (isJumpingPhase) {
+        // In jumping phase, check if there is at least one empty spot
+        for (int row = 0; row < ROW; ++row) {
+            for (int column = 0; column < COLUMN; column += 2) {
+                if (GameBoard[row][column] == 'o') {
+                    return false; // Player can jump to this empty spot
+                }
+            }
+        }
+        return true; // No empty spots to jump to
     }
 
-    for (int zeilen = 0; zeilen < ROW; zeilen++) {
-        for (int spalten = 0; spalten < COLUMN; spalten += 2) {
-            if (GameBoard[zeilen][spalten] == stein) {
-                // Norden
-                do {
-                    if ((zeilen - schrittweite) >= 0 &&
-                        GameBoard[zeilen - schrittweite][spalten] == 'o') {
-                        anzahlfreiernachbarplaetze++;
-                        break;
+    // Lambda function to check if a move is possible in a given direction
+    auto isMovePossible = [&](int row,
+                              int column,
+                              int deltarow,
+                              int deltacolumn,
+                              char barrier) -> bool {
+        int newrow = row + deltarow;
+        int newcolumn = column + deltacolumn;
 
-                    } else if (GameBoard[zeilen - schrittweite][spalten] ==
-                               '|') {
-                        schrittweite++;
-                        continue;
+        while (newrow >= 0 && newrow < ROW && newcolumn >= 0 &&
+               newcolumn < COLUMN) {
+            if (GameBoard[newrow][newcolumn] == 'o') {
+                return true;
+            }
+            if (GameBoard[newrow][newcolumn] == barrier) {
+                newrow += deltarow;
+                newcolumn += deltacolumn;
+                continue;
+            }
+            break;
+        }
+        return false;
+    };
 
-                    } else {
-                        break;
-                    }
-
-                } while (true);
-
-                schrittweite = 1;
-
-                // Sueden
-                do {
-                    if ((zeilen + schrittweite) <= 6 &&
-                        GameBoard[zeilen + schrittweite][spalten] == 'o') {
-                        anzahlfreiernachbarplaetze++;
-                        break;
-
-                    } else if (GameBoard[zeilen + schrittweite][spalten] ==
-                               '|') {
-                        schrittweite++;
-                        continue;
-
-                    } else {
-                        break;
-                    }
-
-                } while (true);
-
-                schrittweite = 1;
-
-                // Westen
-                do {
-                    if ((spalten - schrittweite) >= 0 &&
-                        GameBoard[zeilen][spalten - schrittweite] == 'o') {
-                        anzahlfreiernachbarplaetze++;
-                        break;
-
-                    } else if (GameBoard[zeilen][spalten - schrittweite] ==
-                               '-') {
-                        schrittweite++;
-                        continue;
-
-                    } else {
-                        break;
-                    }
-
-                } while (true);
-
-                schrittweite = 1;
-
-                // Osten
-                do {
-                    if ((spalten + schrittweite) <= 12 &&
-                        GameBoard[zeilen][spalten + schrittweite] == 'o') {
-                        anzahlfreiernachbarplaetze++;
-                        break;
-
-                    } else if (GameBoard[zeilen][spalten + schrittweite] ==
-                               '-') {
-                        schrittweite++;
-                        continue;
-
-                    } else {
-                        break;
-                    }
-
-                } while (true);
+    for (int row = 0; row < ROW; ++row) {
+        for (int column = 0; column < COLUMN; column += 2) {
+            if (GameBoard[row][column] == stein) {
+                // Check all four directions: North, South, West, East
+                if (isMovePossible(row, column, -1, 0, '|') || // North
+                    isMovePossible(row, column, 1, 0, '|') ||  // South
+                    isMovePossible(row, column, 0, -1, '-') || // West
+                    isMovePossible(row, column, 0, 1, '-')) {  // East
+                    return false; // A move is possible
+                }
             }
         }
     }
 
-    if (anzahlfreiernachbarplaetze == 0) {
-        return true; // auf true geaendert
-    } else {
-        return false;
-    } // auf false geaendert
+    return true; // No moves are possible
 }
 
 Player& Board::getCurrentPlayer() {
@@ -420,7 +381,7 @@ void Board::setNextCurrentPlayer() {
 }
 
 void Board::printBoard() {
-    std::cout << "Spielelogik fuer das Muehle Spiel!" << std::endl;
+    std::cout << "Morris Game" << std::endl;
     if (getCurrentPlayer().getCurrentPhase() ==
         Player::GamePhase::PlacementPhase) {
         std::cout << "Placement Phase " << std::endl;
@@ -457,4 +418,13 @@ void Board::clearBoardOutput() {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     system("clear");
     printBoard();
+}
+
+// for unit testing setting up the board how we want
+void Board::setBoard(const char newBoard[ROW][COLUMN]) {
+    for (int i = 0; i < ROW; ++i) {
+        for (int j = 0; j < COLUMN; ++j) {
+            GameBoard[i][j] = newBoard[i][j];
+        }
+    }
 }

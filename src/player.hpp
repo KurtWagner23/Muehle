@@ -38,6 +38,7 @@ public:
     int getMaxPieces(void) const;
 
     void setPieces(int);
+    void setMaxPieces(int);
 
     EndState getEndState(void);
     void setEndState(Player::EndState);

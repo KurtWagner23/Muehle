@@ -37,55 +37,47 @@ int main() {
             } break;
             case Player::GamePhase::Morris: {
                 Gameboard.clearBoardOutput();
-                std::pair<Point, Point> Points = Gameboard.UserInput();
-                Gameboard.removePiece(Points.first);
+                std::pair<Point, Point> input = Gameboard.UserInput();
+                Gameboard.removePiece(input.first);
             } break;
-            // TODO: change language to english
             case Player::GamePhase::GameEnd: {
                 Player::EndState end =
                     Gameboard.getCurrentPlayer().getEndState();
-
                 switch (end) {
                     case Player::EndState::Win: {
                         std::cout << "Player: "
                                   << Gameboard.getCurrentPlayer().getName()
-                                  << " hat gewonnen!!!!!!!!!" << std::endl;
+                                  << " won!!!!!!!!!" << std::endl;
                         std::cout << "Player: "
                                   << Gameboard.getCurrentPlayer()
                                          .getNextPlayer()
                                          ->getName()
-                                  << " hat verloren" << std::endl;
-
+                                  << " lost" << std::endl;
                     } break;
                     case Player::EndState::Loose: {
                         std::cout << "Player: "
                                   << Gameboard.getCurrentPlayer()
                                          .getNextPlayer()
                                          ->getName()
-                                  << " hat gewonnen!!!!!!!!!" << std::endl;
+                                  << " won!!!!!!!!!" << std::endl;
                         std::cout << "Player: "
                                   << Gameboard.getCurrentPlayer().getName()
-                                  << " hat verloren" << std::endl;
-
+                                  << " lost" << std::endl;
                     } break;
                     case Player::EndState::Draw: {
                         std::cout << "Player: "
                                   << Gameboard.getCurrentPlayer().getName()
-                                  << " und "
+                                  << " and "
                                   << Gameboard.getCurrentPlayer()
                                          .getNextPlayer()
                                          ->getName();
-                        std::cout << " haben unentschieden gespielt!"
-                                  << std::endl;
-
+                        std::cout << " drew the game!" << std::endl;
                     } break;
                     default: {
                         exit(-121);
                     } break;
                 }
-
                 ende = 1;
-
             } break;
             default: {
                 exit(-12321);

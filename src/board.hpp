@@ -63,7 +63,10 @@ private:
         {'o', '-', '-', '-', '-', '-', 'o', '-', '-', '-', '-', '-', 'o'}};
 
 public:
+    Board();
     Board(std::string, std::string);
+
+    void setBoard(const char newBoard[ROW][COLUMN]);
 
     void updateGamePhases(void);
 

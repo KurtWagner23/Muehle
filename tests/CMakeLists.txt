@@ -11,7 +11,7 @@ target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
 
 # Test-Verzeichnis CMake-Datei
-set(TEST_SOURCES test_brettlogik.cpp)
+set(TEST_SOURCES test_morris.cpp)
 
 # Füge die Tests hinzu
 add_executable(runTests ${TEST_SOURCES})

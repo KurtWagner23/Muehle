@@ -60,3 +60,7 @@ Player::GamePhase Player::getBeforePhase() const {
 void Player::setPieces(int i) {
     RemainingPieces = i;
 }
+
+void Player::setMaxPieces(int p) {
+    MaxPieces = p;
+}

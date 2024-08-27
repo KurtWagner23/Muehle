@@ -14,6 +14,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 enable_testing()
 add_subdirectory(tests)
 
+# Exclude main.cpp from SOURCES for the library
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp")
+
 add_library(${PROJECT_NAME}_lib STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME}_lib PUBLIC src)
 
