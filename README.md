@@ -14,18 +14,18 @@ cd Muehle
 - C++ Compiler
 - **Optional** CMake Tools Extension in VS Code for easier building and testing
 
-## How to build on Linux or MacOS
+## How to build with Command Line
 ```
-./build.sh
+cmake --preset "debug-config"
+cmake --build --preset "build-debug"
 ```
-
-## On Windows or without CLI
-- Open in VS Code with CMake Tools and C/C++ Extension installed
-- Choose Kit 
-- Click on build on bottom bar
-- Click on Arrow on bottom bar
-
 ## Start Program
 ```
 ./build/muehle-commandline
 ```
+
+## In VS Code
+- Open in VS Code with CMake Tools and C/C++ Extension installed
+- Choose Preset "Debug configuration"
+- Click on build on bottom bar
+- Click on Arrow on bottom bar
