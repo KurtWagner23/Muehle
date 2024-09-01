@@ -136,8 +136,8 @@ void Board::placePiece(Point& p) {
 
     if (getCurrentPlayer().getRemainingPieces() == 0) {
         getCurrentPlayer().setCurrentPhase(Player::GamePhase::TurnPhase);
-        int pieces = getCurrentPlayer().getMaxPieces();
-        getCurrentPlayer().setPieces(pieces);
+        // int pieces = getCurrentPlayer().getMaxPieces();
+        // getCurrentPlayer().setPieces(pieces);
     }
 
     if (isMorris(p)) {
@@ -395,10 +395,10 @@ void Board::printBoard() {
     }
 
     std::cout << "Player 1: " << Sp1.getName()
-              << " Pieces Remaining: " << Sp1.getRemainingPieces()
+              << " Pieces remaining to place: " << Sp1.getRemainingPieces()
               << " Max Pieces: " << Sp1.getMaxPieces() << std::endl;
     std::cout << "Player 2: " << Sp2.getName()
-              << " Pieces Remaining: " << Sp2.getRemainingPieces()
+              << " Pieces remaining to place: " << Sp2.getRemainingPieces()
               << " Max Pieces: " << Sp2.getMaxPieces() << std::endl;
     std::cout << std::endl;
 
