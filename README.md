@@ -28,7 +28,7 @@ cmake --build --preset "build-debug"
 ```
 ### Start Program
 ```
-./build/muehle-commandline
+./build/muehle_commandline
 ```
 
 ## In VS Code
