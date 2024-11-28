@@ -415,9 +415,17 @@ void Board::printBoard() {
     }
 }
 
+void clearScreen() {
+#if defined(_WIN32) || defined(_WIN64) // Windows
+    system("cls");
+#else // for unix-based systems
+    system("clear");
+#endif
+}
+
 void Board::clearBoardOutput() {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    system("clear");
+    clearScreen();
     printBoard();
 }
 
