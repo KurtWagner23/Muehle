@@ -3,7 +3,12 @@
 #include <iostream>
 #include <thread>
 
-std::pair<Point, Point> getUserInput(Board& board);
+struct Input {
+    Point p1;
+    Point p2;
+};
+
+Input getUserInput(Board& board);
 void clearScreen();
 void printBoard(Board& board);
 void clearBoardOutput(Board& board);
@@ -54,8 +59,8 @@ int main() {
 
 bool handlePlacementPhase(Board& board) {
     clearBoardOutput(board);
-    std::pair<Point, Point> input = getUserInput(board);
-    board.placePiece(input.first);
+    Input input = getUserInput(board);
+    board.placePiece(input.p1);
     return board.getCurrentPlayer().getCurrentPhase() ==
            Player::GamePhase::GameEnd;
 }
@@ -64,8 +69,8 @@ bool handleMovePhase(Board& board) {
     if (board.noMovesAvailable())
         return false;
     clearBoardOutput(board);
-    std::pair<Point, Point> input = getUserInput(board);
-    board.movePiece(input.first, input.second);
+    Input input = getUserInput(board);
+    board.movePiece(input.p1, input.p2);
     return board.getCurrentPlayer().getCurrentPhase() ==
            Player::GamePhase::GameEnd;
 }
@@ -74,58 +79,67 @@ bool handleJumpPhase(Board& board) {
     if (board.noMovesAvailable())
         return false;
     clearBoardOutput(board);
-    std::pair<Point, Point> input = getUserInput(board);
-    board.jumpPiece(input.first, input.second);
+    Input input = getUserInput(board);
+    board.jumpPiece(input.p1, input.p2);
     return board.getCurrentPlayer().getCurrentPhase() ==
            Player::GamePhase::GameEnd;
 }
 
 bool handleMorrisPhase(Board& board) {
     clearBoardOutput(board);
-    std::pair<Point, Point> input = getUserInput(board);
-    board.removePiece(input.first);
+    Input input = getUserInput(board);
+    board.removePiece(input.p1);
     return board.getCurrentPlayer().getCurrentPhase() ==
            Player::GamePhase::GameEnd;
 }
 
-std::pair<Point, Point> getUserInput(Board& board) {
-    std::pair<Point, Point> points;
+Input getUserInput(Board& board) {
+    Input points;
     Point dest, current, p;
 
     switch (board.getCurrentPlayer().getCurrentPhase()) {
         case Player::GamePhase::PlacementPhase:
             do {
-                std::cout << "Enter the position to place your piece (x,y): ";
+                std::cout << "Placement Phase!\nEnter the position to place "
+                             "your piece (x,y): ";
                 std::string input;
                 std::cin >> input;
                 p = Point::boardToArrayKoord(input);
             } while (!board.isValidPlacementPosition(p));
-            return std::make_pair(p, Point());
+            return points = {.p1 = p, .p2 = Point()};
 
         case Player::GamePhase::JumpPhase:
-        case Player::GamePhase::TurnPhase:
             do {
-                std::cout
-                    << "Enter current position (x,y) and destination (x,y): ";
+                std::cout << "Jumping Phase!\nEnter current position (x,y) and "
+                             "destination (x,y): ";
                 std::string currentPos, destPos;
                 std::cin >> currentPos >> destPos;
                 current = Point::boardToArrayKoord(currentPos);
                 dest = Point::boardToArrayKoord(destPos);
-            } while (!board.isMovePossible(dest, current) &&
-                     !board.isJumpPossible(dest, current));
-            return std::make_pair(dest, current);
+            } while (!board.isJumpPossible(dest, current));
+            return points = {.p1 = dest, .p2 = current};
+        case Player::GamePhase::TurnPhase:
+            do {
+                std::cout << "Turn Phase!\nEnter current position (x,y) and "
+                             "destination (x,y): ";
+                std::string currentPos, destPos;
+                std::cin >> currentPos >> destPos;
+                current = Point::boardToArrayKoord(currentPos);
+                dest = Point::boardToArrayKoord(destPos);
+            } while (!board.isMovePossible(dest, current));
+            return points = {.p1 = dest, .p2 = current};
 
         case Player::GamePhase::Morris:
             do {
-                std::cout << "Morris phase: Remove opponent's piece (x,y): ";
+                std::cout << "Morris!\nRemove opponent's piece (x,y): ";
                 std::string input;
                 std::cin >> input;
                 p = Point::boardToArrayKoord(input);
             } while (!board.isRemoveValid(p));
-            return std::make_pair(p, Point());
+            return points = {.p1 = p, .p2 = Point()};
 
         default:
-            return std::pair<Point, Point>();
+            return points = {Point(), Point()};
     }
 }
 
@@ -162,7 +176,7 @@ void clearScreen() {
 }
 
 void clearBoardOutput(Board& board) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     clearScreen();
     printBoard(board);
 }
