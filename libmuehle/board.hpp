@@ -10,11 +10,8 @@
 #include "player.hpp"
 #include "point.hpp"
 
-#include <chrono>
-#include <iostream>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 
 #define SPACE ' '
@@ -95,8 +92,8 @@ public:
     Player& getCurrentPlayer(void);
     void setNextCurrentPlayer(void);
 
-    void printBoard(void);
-    void clearBoardOutput(void);
+    Player& getPlayer1(void);
+    Player& getPlayer2(void);
 
-    std::pair<Point, Point> UserInput(void);
+    char getBoardCoord(int, int);
 };

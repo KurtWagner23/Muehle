@@ -1,25 +1,21 @@
+project(muehle_tests LANGUAGES CXX)
+
+# GoogleTest mit FetchContent holen
 include(FetchContent)
 
 FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.11.0
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.12.1
 )
 FetchContent_MakeAvailable(googletest)
-add_library(GTest::GTest INTERFACE IMPORTED)
-target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
+enable_testing()
 
-# Test-Verzeichnis CMake-Datei
-set(TEST_SOURCES test_morris.cpp)
+# Test-Executable erstellen
+add_executable(muehle_tests test_morris.cpp)
+target_link_libraries(muehle_tests PRIVATE muehle_lib gtest gtest_main)
+target_include_directories(muehle_tests PRIVATE ${CMAKE_SOURCE_DIR}/libmuehle)
 
-# Füge die Tests hinzu
-add_executable(runTests ${TEST_SOURCES})
-
-# Verknüpfe die Test-Executable mit der Hauptanwendung
-target_link_libraries(runTests PRIVATE muehle_commandline_lib GTest::GTest)
-
-
-
-# Registriere den Test mit CMake
-add_test(NAME RunUnitTests COMMAND runTests)
+# Tests registrieren
+add_test(NAME MuehleTests COMMAND muehle_tests)

@@ -20,90 +20,6 @@ Board::Board(std::string name_sp1, std::string name_sp2) {
     Sp2.setNextPlayer(Sp1);
 }
 
-std::pair<Point, Point> Board::UserInput() {
-    std::pair<Point, Point> points;
-    Point dest, current;
-    Point p;
-
-    switch (getCurrentPlayer().getCurrentPhase()) {
-        case Player::GamePhase::PlacementPhase: {
-            do {
-                std::cout << "Please type in the position of the Piece u want "
-                             "to place: x,y:"
-                          << std::endl;
-                std::cout << "Position: ";
-
-                std::string Input = "";
-                std::cin >> Input;
-                p = Point::boardToArrayKoord(Input);
-            } while (!isValidPlacementPosition(p));
-
-            return std::make_pair(p, Point());
-        } break;
-
-        case Player::GamePhase::JumpPhase: {
-            do {
-                std::cout
-                    << "Please type in the position of the Piece u want "
-                       "to jump to:\ncurrent position: x,y  destination: x,y:"
-                    << std::endl;
-                std::cout << "Current position: ";
-
-                std::string currentPosition;
-                std::cin >> currentPosition;
-                std::cout << "Destination: ";
-                std::string destPosition;
-                std::cin >> destPosition;
-
-                dest = Point::boardToArrayKoord(destPosition);
-                current = Point::boardToArrayKoord(currentPosition);
-
-            } while (!isJumpPossible(dest, current));
-
-            return std::make_pair(dest, current);
-
-        } break;
-
-        case Player::GamePhase::TurnPhase: {
-            do {
-                std::cout
-                    << "Please type in the position of the Piece u want "
-                       "to move to:\ncurrent position: x,y, destination: x,y:"
-                    << std::endl;
-                std::cout << "Current position: ";
-
-                std::string currentPosition;
-                std::cin >> currentPosition;
-                std::cout << "Destination: ";
-                std::string destPosition;
-                std::cin >> destPosition;
-
-                dest = Point::boardToArrayKoord(destPosition);
-                current = Point::boardToArrayKoord(currentPosition);
-
-            } while (!isMovePossible(dest, current));
-
-            return std::make_pair(dest, current);
-        } break;
-        case Player::GamePhase::Morris: {
-            do {
-                std::string Input;
-
-                std::cout
-                    << "Morris! Please remove opponent piece: position: x,y:"
-                    << std::endl;
-                std::cin >> Input;
-
-                p = Point::boardToArrayKoord(Input);
-            } while (!isRemoveValid(p));
-            return std::make_pair(p, Point());
-        } break;
-        default:
-            break;
-    }
-    return std::pair<Point, Point>();
-}
-
 bool Board::isRemoveValid(Point& p) {
     if (currentPlayer == &Sp1 && GameBoard[p.getY()][p.getX()] == BLACK) {
         return true;
@@ -381,52 +297,15 @@ void Board::setNextCurrentPlayer() {
     currentPlayer = currentPlayer->getNextPlayer();
 }
 
-void Board::printBoard() {
-    std::cout << "Morris Game" << std::endl;
-    if (getCurrentPlayer().getCurrentPhase() ==
-        Player::GamePhase::PlacementPhase) {
-        std::cout << "Placement Phase " << std::endl;
-    } else if (getCurrentPlayer().getCurrentPhase() ==
-               Player::GamePhase::JumpPhase) {
-        std::cout << "Jumping Phase " << std::endl;
-    } else if (getCurrentPlayer().getCurrentPhase() ==
-               Player::GamePhase::TurnPhase) {
-        std::cout << "Turn Phase " << std::endl;
-    }
-
-    std::cout << "Player 1: " << Sp1.getName()
-              << " Pieces remaining to place: " << Sp1.getRemainingPieces()
-              << " Max Pieces: " << Sp1.getMaxPieces() << std::endl;
-    std::cout << "Player 2: " << Sp2.getName()
-              << " Pieces remaining to place: " << Sp2.getRemainingPieces()
-              << " Max Pieces: " << Sp2.getMaxPieces() << std::endl;
-    std::cout << std::endl;
-
-    std::cout << getCurrentPlayer().getName() << " turn" << std::endl
-              << std::endl;
-    std::cout << "  0 1 2 3 4 5 6" << std::endl;
-    for (int i = 0; i < ROW; ++i) {
-        std::cout << i << " ";
-        for (int j = 0; j < COLUMN; ++j) {
-            std::cout << GameBoard[i][j];
-        }
-
-        std::cout << std::endl;
-    }
+Player& Board::getPlayer1(void) {
+    return Sp1;
+}
+Player& Board::getPlayer2(void) {
+    return Sp2;
 }
 
-void clearScreen() {
-#if defined(_WIN32) || defined(_WIN64) // Windows
-    system("cls");
-#else // for unix-based systems
-    system("clear");
-#endif
-}
-
-void Board::clearBoardOutput() {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    clearScreen();
-    printBoard();
+char Board::getBoardCoord(int i, int j) {
+    return GameBoard[i][j];
 }
 
 // for unit testing setting up the board how we want

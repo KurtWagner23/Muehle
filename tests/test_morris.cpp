@@ -1,4 +1,4 @@
-#include "../src/board.hpp"
+#include "board.hpp"
 #include "gtest/gtest.h"
 
 class BoardTest : public ::testing::Test {
